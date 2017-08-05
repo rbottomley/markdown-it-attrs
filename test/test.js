@@ -2,8 +2,8 @@
 'use strict';
 var assert = require('assert');
 var Md = require('markdown-it');
-var markdownItAttrs = require('./');
-var utils = require('./utils.js');
+var markdownItAttrs = require('../');
+var utils = require('../utils.js');
 
 describe('markdown-it-attrs.utils', () => {
   it('should parse {.class #id key=val}', () => {

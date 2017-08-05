@@ -1,6 +1,6 @@
 /* eslint-env es6 */
 var md = require('markdown-it')();
-var markdownItAttrs = require('./');
+var markdownItAttrs = require('../');
 
 md.use(markdownItAttrs);
 

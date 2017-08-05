@@ -1,6 +1,7 @@
 'use strict';
 var md = require('markdown-it')();
-var markdownItAttrs = require('markdown-it-attrs');
+//var markdownItAttrs = require('markdown-it-attrs');
+var markdownItAttrs = require('../');
 
 md.use(markdownItAttrs);
 
