@@ -31,7 +31,7 @@ browserify:
 	mkdir dist
 	# Browserify
 	( printf "/*! ${NPM_PACKAGE} ${NPM_VERSION} ${GITHUB_PROJ} @license MIT */" ; \
-		browserify ./ -s markdownitAbbr \
+		browserify ./ -s markdownitAttrs \
 		) > dist/${NPM_PACKAGE}.js
 
 minify: browserify
