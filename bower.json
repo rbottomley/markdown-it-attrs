@@ -27,9 +27,8 @@
     "**/.*",
     "node_modules",
     "bower_components",
-    "test",
-    "tests",
+    "test/test.js",
     "index.js",
-    "demo.js"
+    "demo/demo.js"
   ]
 }

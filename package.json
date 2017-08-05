@@ -11,7 +11,7 @@
     "url": "arve0.github.io"
   },
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">=4.0"
   },
   "scripts": {
     "browser": "browserify index.js --standalone markdown-it-attrs -o markdown-it-attrs.browser.js",
@@ -41,13 +41,16 @@
   ],
   "dependencies": {},
   "devDependencies": {
-    "browserify": "14.3.0",
-    "eslint": "3.19.0",
-    "markdown-it": "github:GerHobbelt/markdown-it",
-    "mocha": "3.3.0"
+    "browserify": "14.4.0",
+    "eslint": "4.3.0",
+    "istanbul": "0.4.5",
+    "markdown-it": "GerHobbelt/markdown-it#master",
+    "markdown-it-testgen": "GerHobbelt/markdown-it-testgen#master",
+    "mocha": "3.5.0",
+    "uglify-js": "3.0.27"
   },
   "peerDependencies": {
-    "markdown-it": "github:GerHobbelt/markdown-it"
+    "markdown-it": "GerHobbelt/markdown-it#master"
   },
-  "tonicExampleFilename": "demo.js"
+  "tonicExampleFilename": "demo/demo.js"
 }

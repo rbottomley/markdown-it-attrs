@@ -1,1 +1,6 @@
+coverage/
+dist/
+node_modules
+
 markdown-it-attrs.browser.js
+
