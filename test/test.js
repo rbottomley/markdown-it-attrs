@@ -1,15 +1,15 @@
 /* eslint-env mocha, es6 */
 'use strict';
 var assert = require('assert');
-var Md = require('markdown-it');
+var md_it = require('@gerhobbelt/markdown-it');
 var markdownItAttrs = require('../');
 var utils = require('../utils.js');
 
 describe('markdown-it-attrs.utils', () => {
   it('should parse {.class #id key=val}', () => {
     var src = '{.red #head key=val}';
-    var expected = [['class', 'red'], ['id', 'head'], ['key', 'val']];
-    var res = utils.getAttrs(src, 1, src.length-1);
+    var expected = [ [ 'class', 'red' ], [ 'id', 'head' ], [ 'key', 'val' ] ];
+    var res = utils.getAttrs(src, 1, src.length - 1);
     assert.deepEqual(res, expected);
   });
 });
@@ -17,7 +17,7 @@ describe('markdown-it-attrs.utils', () => {
 describe('markdown-it-attrs', () => {
   var md, src, expected;
   beforeEach(() => {
-    md = Md().use(markdownItAttrs);
+    md = md_it().use(markdownItAttrs);
   });
 
   it('should add attributes when {} in end of last inline', () => {
@@ -94,9 +94,9 @@ describe('markdown-it-attrs', () => {
     src += '  {.c}\n';
     src += '    1. nested nested item {.d}\n';
     src += '    {.e}\n';
-// Adding class to top ul not supported
-//    src += '{.f}';
-//    expected = '<ul class="f">\n';
+    // Adding class to top ul not supported
+    //    src += '{.f}';
+    //    expected = '<ul class="f">\n';
     expected = '<ul>\n';
     expected += '<li class="a">item 1\n';
     expected += '<ul class="c">\n';

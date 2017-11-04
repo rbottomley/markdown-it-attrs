@@ -6,7 +6,7 @@
  * @param {int} end: where to stop parsing (not including })
  * @returns {2d array}: [['key', 'val'], ['class', 'red']]
  */
-exports.getAttrs = function(str, start, end) {
+exports.getAttrs = function (str, start, end) {
   // not tab, line feed, form feed, space, solidus, greater than sign, quotation mark, apostrophe and equals sign
   var allowedKeyChars = /[^\t\n\f \/>"'=]/;
   var pairSeparator = ' ';
@@ -21,7 +21,7 @@ exports.getAttrs = function(str, start, end) {
   var valueInsideQuotes = false;
 
   // read inside {}
-  for (var i=start; i <= end; ++i) {
+  for (var i = start; i <= end; ++i) {
     var char_ = str.charAt(i);
 
     // switch to reading value if equal sign
@@ -60,7 +60,7 @@ exports.getAttrs = function(str, start, end) {
         // beginning or ending space: { .red } vs {.red}
         continue;
       }
-      attrs.push([key, value]);
+      attrs.push([ key, value ]);
       key = '';
       value = '';
       parsingKey = true;
@@ -88,8 +88,8 @@ exports.getAttrs = function(str, start, end) {
  * @param {token} token: which token to add attributes
  * @returns token
  */
-exports.addAttrs = function(attrs, token) {
-  for (var j=0, l=attrs.length; j<l; ++j) {
+exports.addAttrs = function (attrs, token) {
+  for (var j = 0, l = attrs.length; j < l; ++j) {
     var key = attrs[j][0];
     if (key === 'class') {
       token.attrJoin('class', attrs[j][1]);
@@ -116,7 +116,7 @@ function replaceUnsafeChar(ch) {
   return HTML_REPLACEMENTS[ch];
 }
 
-exports.escapeHtml = function(str) {
+exports.escapeHtml = function (str) {
   if (HTML_ESCAPE_TEST_RE.test(str)) {
     return str.replace(HTML_ESCAPE_REPLACE_RE, replaceUnsafeChar);
   }

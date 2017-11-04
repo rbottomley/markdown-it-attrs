@@ -4,7 +4,7 @@ var utils = require('./utils.js');
 
 module.exports = function attributes(md) {
 
-  function curlyAttrs(state){
+  function curlyAttrs(state) {
     var tokens = state.tokens;
     var l = tokens.length;
     for (var i = 0; i < l; ++i) {
@@ -60,7 +60,7 @@ module.exports = function attributes(md) {
       //   "block": false,
       //   "hidden": false
       // }
-      for (var j=0, k=inlineTokens.length; j<k; ++j) {
+      for (var j = 0, k = inlineTokens.length; j < k; ++j) {
         // should be inline token of type text
         if (!inlineTokens[j] || inlineTokens[j].type !== 'text') {
           continue;
@@ -190,11 +190,11 @@ function bulletListOpen(tokens, i) {
         token.type === 'ordered_list_open') {
       if (level === 0) {
         return token;
-      } else {
-        level -= 1;
       }
+      level -= 1;
     }
   }
+  return undefined;
 }
 
 /**
@@ -214,7 +214,9 @@ function matchingOpeningToken(tokens, i) {
       return tokens[i];
     }
   }
+  return undefined;
 }
+
 /**
  * Removes last curly from string.
  */
