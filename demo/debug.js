@@ -1,14 +1,14 @@
 /* eslint-env es6 */
-var md = require('markdown-it')();
-var markdownItAttrs = require('../');
+const md = require('markdown-it')();
+const markdownItAttrs = require('../');
 
-md.use(markdownItAttrs);
+md.use(markdownItAttrs, {
+  leftDelimiter: '{{',
+  rightDelimiter: '}}'
+}).use(require('../markdown-it-implicit-figures'));
 
-var src = `- i1
-  - n1
-  {.first}
-{.second}`;
+let src = 'asdf *asd*{{.c}} khg';
 
-var res = md.render(src);
+let res = md.render(src);
 
 console.log(res);  // eslint-disable-line
