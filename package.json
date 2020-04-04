@@ -4,7 +4,6 @@
   "description": "Add classes, identifiers and attributes to your markdown with {} curly brackets, similar to pandoc's header attributes",
   "type": "module",
   "main": "index.js",
-  "browser": "dist/markdown-it-attrs.js",
   "files": [
     "LICENSE",
     "index.js",
