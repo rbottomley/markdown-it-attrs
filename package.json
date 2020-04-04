@@ -1,6 +1,6 @@
 {
   "name": "@gerhobbelt/markdown-it-attrs",
-  "version": "2.3.2-11",
+  "version": "3.0.2-11",
   "description": "Add classes, identifiers and attributes to your markdown with {} curly brackets, similar to pandoc's header attributes",
   "main": "index.js",
   "license": "MIT",
@@ -8,13 +8,15 @@
   "author": {
     "name": "Arve Seljebu",
     "email": "arve.seljebu@gmail.com",
-    "url": "arve0.github.io"
+    "url": "https://arve0.github.io"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=8"
   },
   "scripts": {
     "test": "make test",
+    "lint": "make lint",
+    "fix": "make lintfix",
     "build": "make",
     "pub": "npm publish --access public"
   },
@@ -24,13 +26,9 @@
     "markdown",
     "markdown-it",
     "markdown-it-plugin",
-    "attribute",
     "attributes",
-    "class",
     "classes",
-    "id",
     "ids",
-    "identifier",
     "identifiers",
     "curly brackets",
     "pandoc",
@@ -38,9 +36,14 @@
   ],
   "dependencies": {},
   "devDependencies": {
+    "@babel/core": "7.4.3",
+    "@babel/preset-env": "7.4.3",
+    "babelify": "10.0.0",
+    "coveralls": "3.0.3",
+    "eslint": "5.16.0",
+    "nyc": "14.1.1",
     "browserify": "16.5.0",
     "eslint": "6.6.0",
-    "istanbul": "0.4.5",
     "@gerhobbelt/markdown-it": "10.0.0-30",
     "@gerhobbelt/markdown-it-testgen": "0.1.5-6",
     "@gerhobbelt/markdown-it-implicit-figures": "0.3.2-1",
@@ -48,7 +51,7 @@
     "uglify-js": "3.6.8"
   },
   "peerDependencies": {
-    "@gerhobbelt/markdown-it": "~8.4.2-24"
+    "@gerhobbelt/markdown-it": ">= 10.0"
   },
   "tonicExampleFilename": "demo/demo.js"
 }

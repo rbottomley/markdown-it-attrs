@@ -89,7 +89,25 @@ exports.getAttrs = function (str, start, options) {
     }
     value += char_;
   }
-  return attrs;
+
+  if (options.allowedAttributes && options.allowedAttributes.length) {
+    let allowedAttributes = options.allowedAttributes;
+
+    return attrs.filter(function (attrPair) {
+      let attr = attrPair[0];
+
+      function isAllowedAttribute (allowedAttribute) {
+        return (attr === allowedAttribute
+          || (allowedAttribute instanceof RegExp && allowedAttribute.test(attr))
+        );
+      }
+
+      return allowedAttributes.some(isAllowedAttribute);
+    });
+
+  } else {
+    return attrs;
+  }
 };
 
 /**
@@ -222,12 +240,7 @@ exports.getMatchingOpeningToken = function (tokens, i) {
     return tokens[i];
   }
 
-  // inline tokens changes level on same token
-  // that have .nesting +- 1
-  let level = tokens[i].block
-    ? tokens[i].level
-    : tokens[i].level + 1;  // adjust for inline tokens
-
+  let level = tokens[i].level;
   let type = tokens[i].type.replace('_close', '_open');
 
   for (; i >= 0; --i) {

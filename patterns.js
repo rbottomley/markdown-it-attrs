@@ -1,4 +1,5 @@
 'use strict';
+
 /**
  * If a pattern matches the token stream,
  * then run transform.
@@ -150,6 +151,7 @@ module.exports = options => {
               type: 'softbreak'
             }, {
               position: -1,
+              type: 'text',
               content: utils.hasDelimiters('only', options)
             }
           ]
@@ -219,6 +221,7 @@ module.exports = options => {
           children: [
             {
               position: -1,
+              type: 'text',
               content: utils.hasDelimiters('end', options)
             }
           ]
