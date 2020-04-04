@@ -37,7 +37,7 @@ module.exports = function attributes(md, options) {
     }
   }
 
-  md.core.ruler.before('linkify', 'curly_attributes', curlyAttrs);
+  md.core.ruler.after('inline', 'curly_attributes', curlyAttrs);
 };
 
 /**
