@@ -12,27 +12,30 @@ CURR_HEAD   := $(firstword $(shell git show-ref --hash HEAD | cut -b -6) master)
 GITHUB_PROJ := https://github.com//GerHobbelt/${NPM_PACKAGE}
 
 
-build: lint browserify test coverage todo 
+build: browserify test coverage todo 
 
 lint:
 	eslint .
 
-test: lint
-	mocha
+lintfix:
+	eslint --fix .
 
-coverage:
-	-rm -rf coverage
-	istanbul cover node_modules/mocha/bin/_mocha
+test: 
+	nyc mocha
+
+coverage: test
 
 report-coverage: coverage
+	-rm -rf .nyc_output
+	nyc report --reporter=text-lcov | coveralls
 
 browserify:
 	-rm -rf ./dist
 	mkdir dist
 	# Browserify
 	( printf "/*! ${NPM_PACKAGE} ${NPM_VERSION} ${GITHUB_PROJ} @license MIT */" ; \
-		browserify ./ -s markdownitAttrs \
-		) > dist/${NPM_PACKAGE}.js
+		browserify index.js -t [ babelify --presets [ @babel/preset-env ] ] --standalone markdown-it-attrs -o markdown-it-attrs.browser.js \
+	) > dist/${NPM_PACKAGE}.js
 
 minify: browserify
 	# Minify
