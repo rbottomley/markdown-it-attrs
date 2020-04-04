@@ -24,7 +24,7 @@ exports.getAttrs = function (str, start, options) {
   // breaks when } is found or end of string
   for (let i = start + options.leftDelimiter.length; i < str.length; i++) {
     if (str.slice(i, i + options.rightDelimiter.length) === options.rightDelimiter) {
-      if (key !== '') { attrs.push([key, value]); }
+      if (key !== '') { attrs.push([ key, value ]); }
       break;
     }
     let char_ = str.charAt(i);
@@ -96,7 +96,7 @@ exports.getAttrs = function (str, start, options) {
     return attrs.filter(function (attrPair) {
       let attr = attrPair[0];
 
-      function isAllowedAttribute (allowedAttribute) {
+      function isAllowedAttribute(allowedAttribute) {
         return (attr === allowedAttribute
           || (allowedAttribute instanceof RegExp && allowedAttribute.test(attr))
         );
@@ -105,9 +105,9 @@ exports.getAttrs = function (str, start, options) {
       return allowedAttributes.some(isAllowedAttribute);
     });
 
-  } else {
-    return attrs;
   }
+  return attrs;
+
 };
 
 /**
@@ -158,7 +158,7 @@ exports.hasDelimiters = function (where, options) {
       return false;
     }
 
-    function validCurlyLength (curly) {
+    function validCurlyLength(curly) {
       let isClass = curly.charAt(options.leftDelimiter.length) === '.';
       let isId = curly.charAt(options.leftDelimiter.length) === '#';
       return (isClass || isId)
@@ -223,7 +223,7 @@ exports.removeDelimiter = function (str, options) {
  * @param {string} s Regex string.
  * @return {string} Escaped string.
  */
-function escapeRegExp (s) {
+function escapeRegExp(s) {
   return s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 exports.escapeRegExp = escapeRegExp;
@@ -248,6 +248,7 @@ exports.getMatchingOpeningToken = function (tokens, i) {
       return tokens[i];
     }
   }
+  return false;
 };
 
 

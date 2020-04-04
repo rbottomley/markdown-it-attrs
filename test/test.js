@@ -3,8 +3,8 @@
 const assert = require('assert');
 const Md = require('@gerhobbelt/markdown-it');
 const implicitFigures = require('@gerhobbelt/markdown-it-implicit-figures');
-const attrs = require('./');
-const utils = require('./utils.js');
+const attrs = require('../');
+const utils = require('../utils.js');
 
 
 describeTestsWithOptions({
