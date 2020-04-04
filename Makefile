@@ -33,9 +33,11 @@ browserify:
 	-rm -rf ./dist
 	mkdir dist
 	# Browserify
-	( printf "/*! ${NPM_PACKAGE} ${NPM_VERSION} ${GITHUB_PROJ} @license MIT */" ; \
-		browserify index.js -t [ babelify --presets [ @babel/preset-env ] ] --standalone markdown-it-attrs -o markdown-it-attrs.browser.js \
+	browserify ./index.js --no-browser-field --standalone markdown-it-attrs -o markdown-it-attrs.browser.js
+	( printf "/*! ${NPM_PACKAGE} ${NPM_VERSION} ${GITHUB_PROJ} @license MIT */\n\n" ; \
+		 cat markdown-it-attrs.browser.js \
 	) > dist/${NPM_PACKAGE}.js
+	rm -f markdown-it-attrs.browser.js
 
 minify: browserify
 	# Minify
