@@ -45,6 +45,12 @@ minify: browserify
 		--preamble "/*! ${NPM_PACKAGE} ${NPM_VERSION} ${GITHUB_PROJ} @license MIT */" \
 		> dist/${NPM_PACKAGE}.min.js
 
+demo:
+	node demo/demo.js
+
+debugdemo:
+	node demo/debug.js
+
 todo:
 	@echo ""
 	@echo "TODO list"
@@ -65,5 +71,5 @@ prep: superclean
 	-npm install
 
 
-.PHONY: clean lint test todo coverage report-coverage build browserify minify superclean prep
+.PHONY: clean lint test todo coverage report-coverage build browserify minify superclean prep demo debugdemo
 .SILENT: help lint test todo
