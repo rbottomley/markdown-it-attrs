@@ -5,4 +5,4 @@ node_js:
  - node
 script: make
 sudo: false
-after_success: npm run coverage
+after_success: npm run report_coverage
