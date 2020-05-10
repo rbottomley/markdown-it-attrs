@@ -282,7 +282,7 @@ module.exports = options => {
           shift: 1,
           type: 'inline',
           children: (arr) => arr.length === 1,
-          content: (str) => str.match(__hr) !== null,
+          content: (str) => str.match(__hr) !== null
         },
         {
           shift: 2,

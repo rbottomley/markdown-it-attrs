@@ -1,7 +1,9 @@
 PATH        := ./node_modules/.bin:${PATH}
 
-NPM_PACKAGE := $(shell node -e 'process.stdout.write(require("./package.json").name.replace(/^.*?\//, ""))')
-NPM_VERSION := $(shell node -e 'process.stdout.write(require("./package.json").version)')
+NPM_PACKAGE := $(shell support/getGlobalName.js package)
+NPM_VERSION := $(shell support/getGlobalName.js version)
+
+GLOBAL_NAME := $(shell support/getGlobalName.js global)
 
 TMP_PATH    := /tmp/${NPM_PACKAGE}-$(shell date +%s)
 
@@ -12,7 +14,7 @@ CURR_HEAD   := $(firstword $(shell git show-ref --hash HEAD | cut -b -6) master)
 GITHUB_PROJ := https://github.com//GerHobbelt/${NPM_PACKAGE}
 
 
-build: browserify test coverage todo 
+build: lint browserify rollup test coverage todo 
 
 lint:
 	eslint .
@@ -20,24 +22,44 @@ lint:
 lintfix:
 	eslint --fix .
 
-test: 
-	nyc mocha
+rollup:
+	-mkdir dist
+	# Rollup
+	rollup -c
 
-coverage: test
+test:
+	mocha
 
-report-coverage: coverage
-	-rm -rf .nyc_output
-	nyc report --reporter=text-lcov | coveralls
+coverage:
+	-rm -rf coverage
+	cross-env NODE_ENV=test nyc mocha
+
+report-coverage: lint coverage
+
+
+publish:
+	@if test 0 -ne `git status --porcelain | wc -l` ; then \
+		echo "Unclean working tree. Commit or stash changes first." >&2 ; \
+		exit 128 ; \
+		fi
+	@if test 0 -ne `git fetch ; git status | grep '^# Your branch' | wc -l` ; then \
+		echo "Local/Remote history differs. Please push/pull changes." >&2 ; \
+		exit 128 ; \
+		fi
+	@if test 0 -ne `git tag -l ${NPM_VERSION} | wc -l` ; then \
+		echo "Tag ${NPM_VERSION} exists. Update package.json" >&2 ; \
+		exit 128 ; \
+		fi
+	git tag ${NPM_VERSION} && git push origin ${NPM_VERSION}
+	npm run pub
 
 browserify:
 	-rm -rf ./dist
 	mkdir dist
 	# Browserify
-	browserify ./index.js --no-browser-field --standalone markdown-it-attrs -o markdown-it-attrs.browser.js
 	( printf "/*! ${NPM_PACKAGE} ${NPM_VERSION} ${GITHUB_PROJ} @license MIT */\n\n" ; \
-		 cat markdown-it-attrs.browser.js \
-	) > dist/${NPM_PACKAGE}.js
-	rm -f markdown-it-attrs.browser.js
+		browserify ./index.js --no-browser-field -s ${GLOBAL_NAME} \
+		) > dist/${NPM_PACKAGE}.js
 
 minify: browserify
 	# Minify
@@ -56,7 +78,7 @@ todo:
 	@echo "TODO list"
 	@echo "---------"
 	@echo ""
-	grep 'TODO' -n -r ./lib 2>/dev/null || test true
+	grep 'TODO' -n -r ./ --exclude-dir=node_modules --exclude-dir=unicode-homographs --exclude-dir=dist --exclude-dir=coverage --exclude=Makefile 2>/dev/null || test true
 
 clean:
 	-rm -rf ./coverage/
@@ -71,5 +93,5 @@ prep: superclean
 	-npm install
 
 
-.PHONY: clean lint test todo coverage report-coverage build browserify minify superclean prep demo debugdemo
+.PHONY: demo debugdemo clean superclean prep publish lint fix test todo coverage report-coverage doc build browserify minify gh-doc rollup
 .SILENT: help lint test todo
