@@ -626,7 +626,8 @@ function last(arr) {
 const defaultOptions = {
   leftDelimiter: '{',
   rightDelimiter: '}',
-  allowedAttributes: []
+  allowedAttributes: [],
+  ignore: null            // callback(token)
 };
 
 var markdownItAttrs = function attributes(md, options_) {
@@ -643,7 +644,7 @@ var markdownItAttrs = function attributes(md, options_) {
         let pattern = patterns$1[p];
         let j = null; // position of child with offset 0
         let match = pattern.tests.every(t => {
-          let res = test(tokens, i, t);
+          let res = test(tokens, i, t, options);
           if (res.j !== null) { j = res.j; }
           return res.match;
         });
@@ -669,7 +670,7 @@ var markdownItAttrs = function attributes(md, options_) {
  * @param {object} t Test to match.
  * @return {object} { match: true|false, j: null|number }
  */
-function test(tokens, i, t) {
+function test(tokens, i, t, options) {
   let res = {
     match: false,
     j: null  // position of child
@@ -680,8 +681,10 @@ function test(tokens, i, t) {
     : t.position;
   let token = get(tokens, ii);  // supports negative ii
 
-
-  if (token === undefined) { return res; }
+  // supports ignore token
+  if (token === undefined || (options.ignore && options.ignore(token))) {
+    return res;
+  }
 
   for (let key in t) {
     if (key === 'shift' || key === 'position') { continue; }
@@ -697,7 +700,7 @@ function test(tokens, i, t) {
       let children = token.children;
       if (childTests.every(tt => tt.position !== undefined)) {
         // positions instead of shifts, do not loop all children
-        match = childTests.every(tt => test(children, tt.position, tt).match);
+        match = childTests.every(tt => test(children, tt.position, tt, options).match);
         if (match) {
           // we may need position of child in transform
           let j = last$1(childTests).position;
@@ -705,7 +708,7 @@ function test(tokens, i, t) {
         }
       } else {
         for (let j = 0; j < children.length; j++) {
-          match = childTests.every(tt => test(children, j, tt).match);
+          match = childTests.every(tt => test(children, j, tt, options).match);
           if (match) {
             res.j = j;
             // all tests true, continue with next key of pattern t

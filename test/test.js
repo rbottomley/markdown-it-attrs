@@ -7,6 +7,11 @@ const attrs = require('../');
 const utils = require('../utils.js');
 
 
+function replaceDelimiters(text, options) {
+  return text.replace(/{/g, options.leftDelimiter).replace(/}/g, options.rightDelimiter);
+}
+
+
 describeTestsWithOptions({
   leftDelimiter: '{',
   rightDelimiter: '}'
@@ -381,8 +386,4 @@ function describeTestsWithOptions(options, postText) {
       assert.equal(md.render(replaceDelimiters(src, options)), expected);
     });
   });
-}
-
-function replaceDelimiters(text, options) {
-  return text.replace(/{/g, options.leftDelimiter).replace(/}/g, options.rightDelimiter);
 }
