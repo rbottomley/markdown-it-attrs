@@ -1,6 +1,5 @@
-'use strict';
 
-const patternsConfig = require('./patterns.js');
+import patternsConfig from './patterns.js';
 
 const defaultOptions = {
   leftDelimiter: '{',
@@ -9,7 +8,7 @@ const defaultOptions = {
   ignore: null            // callback(token)
 };
 
-module.exports = function attributes(md, options_) {
+function attributes(md, options_) {
   let options = Object.assign({}, defaultOptions);
   options = Object.assign(options, options_);
 
@@ -39,7 +38,7 @@ module.exports = function attributes(md, options_) {
   }
 
   md.core.ruler.after('inline', 'curly_attributes', curlyAttrs);
-};
+}
 
 /**
  * Test if t matches token stream.
@@ -149,3 +148,7 @@ function get(arr, n) {
 function last(arr) {
   return arr.slice(-1)[0] || {};
 }
+
+//module.exports = attributes;
+export default attributes;
+

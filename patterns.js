@@ -1,13 +1,12 @@
-'use strict';
+
+import * as utils from './utils.js';
 
 /**
  * If a pattern matches the token stream,
  * then run transform.
  */
 
-const utils = require('./utils.js');
-
-module.exports = options => {
+function patternsConfig(options) {
   const __hr = new RegExp('^ {0,3}[-*_]{3,} ?'
                           + utils.escapeRegExp(options.leftDelimiter)
                           + '[^' + utils.escapeRegExp(options.rightDelimiter) + ']');
@@ -332,9 +331,11 @@ module.exports = options => {
       }
     }
   ]);
-};
+}
 
 // get last element of array or string
 function last(arr) {
   return arr.slice(-1)[0];
 }
+
+export default patternsConfig;

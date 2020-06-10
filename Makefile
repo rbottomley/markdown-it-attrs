@@ -4,6 +4,7 @@ NPM_PACKAGE := $(shell support/getGlobalName.js package)
 NPM_VERSION := $(shell support/getGlobalName.js version)
 
 GLOBAL_NAME := $(shell support/getGlobalName.js global)
+BUNDLE_NAME := $(shell support/getGlobalName.js microbundle)
 
 TMP_PATH    := /tmp/${NPM_PACKAGE}-$(shell date +%s)
 
@@ -14,7 +15,7 @@ CURR_HEAD   := $(firstword $(shell git show-ref --hash HEAD | cut -b -6) master)
 GITHUB_PROJ := https://github.com//GerHobbelt/${NPM_PACKAGE}
 
 
-build: lint browserify rollup test coverage todo 
+build: lint bundle test coverage todo 
 
 lint:
 	eslint .
@@ -22,16 +23,21 @@ lint:
 lintfix:
 	eslint --fix .
 
-rollup:
-	-mkdir dist
-	# Rollup
-	rollup -c
+bundle:
+	-rm -rf ./dist
+	mkdir dist
+	microbundle --no-compress --target node --strict --name ${GLOBAL_NAME}
+	mkdir dist/utils
+	microbundle --no-compress --target node --strict --name utils          --no-sourcemap -f cjs -o dist/utils ./utils.js
+	mv dist/utils/markdown-it-attrs.js dist/utils/utils.js
+	npx prepend-header 'dist/*js' support/header.js
 
 test:
 	mocha
 
 coverage:
 	-rm -rf coverage
+	-rm -rf .nyc_output
 	cross-env NODE_ENV=test nyc mocha
 
 report-coverage: lint coverage
@@ -53,20 +59,6 @@ publish:
 	git tag ${NPM_VERSION} && git push origin ${NPM_VERSION}
 	npm run pub
 
-browserify:
-	-rm -rf ./dist
-	mkdir dist
-	# Browserify
-	( printf "/*! ${NPM_PACKAGE} ${NPM_VERSION} ${GITHUB_PROJ} @license MIT */\n\n" ; \
-		browserify ./index.js --no-browser-field -s ${GLOBAL_NAME} \
-		) > dist/${NPM_PACKAGE}.js
-
-minify: browserify
-	# Minify
-	terser dist/${NPM_PACKAGE}.js -b beautify=false,ascii_only=true -c -m \
-		--preamble "/*! ${NPM_PACKAGE} ${NPM_VERSION} ${GITHUB_PROJ} @license MIT */" \
-		> dist/${NPM_PACKAGE}.min.js
-
 demo:
 	node demo/demo.js
 
@@ -83,6 +75,7 @@ todo:
 clean:
 	-rm -rf ./coverage/
 	-rm -rf ./dist/
+	-rm -rf ./.nyc_output/
 
 superclean: clean
 	-rm -rf ./node_modules/
@@ -91,7 +84,8 @@ superclean: clean
 prep: superclean
 	-ncu -a --packageFile=package.json
 	-npm install
+	-npm audit fix
 
 
-.PHONY: demo debugdemo clean superclean prep publish lint fix test todo coverage report-coverage doc build browserify minify gh-doc rollup
+.PHONY: demo debugdemo clean superclean prep publish lint lintfix test todo coverage report-coverage doc build gh-doc bundle
 .SILENT: help lint test todo
