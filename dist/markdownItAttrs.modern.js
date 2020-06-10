@@ -1,4 +1,4 @@
-/*! markdown-it-attrs 3.0.2-16 https://github.com//GerHobbelt/markdown-it-attrs @license MIT */
+/*! markdown-it-attrs 3.0.3-16 https://github.com//GerHobbelt/markdown-it-attrs @license MIT */
 
 function getAttrs(str, start, options) {
   const allowedKeyChars = /[^\t\n\f />"'=]/;
