@@ -1,6 +1,13 @@
 'use strict';
 
+/**
+ * parse {.class #id key=val} strings
+ * @param {string} str: string to parse
+ * @param {int} start: where to start parsing (including {)
+ * @returns {2d array}: [['key', 'val'], ['class', 'red']]
+ */
 function getAttrs(str, start, options) {
+  // not tab, line feed, form feed, space, solidus, greater than sign, quotation mark, apostrophe and equals sign
   const allowedKeyChars = /[^\t\n\f />"'=]/;
   const pairSeparator = ' ';
   const keySeparator = '=';
@@ -10,7 +17,9 @@ function getAttrs(str, start, options) {
   let key = '';
   let value = '';
   let parsingKey = true;
-  let valueInsideQuotes = false;
+  let valueInsideQuotes = false; // read inside {}
+  // start + left delimiter length to avoid beginning {
+  // breaks when } is found or end of string
 
   for (let i = start + options.leftDelimiter.length; i < str.length; i++) {
     if (str.slice(i, i + options.rightDelimiter.length) === options.rightDelimiter) {
@@ -21,12 +30,13 @@ function getAttrs(str, start, options) {
       break;
     }
 
-    let char_ = str.charAt(i);
+    let char_ = str.charAt(i); // switch to reading value if equal sign
 
     if (char_ === keySeparator && parsingKey) {
       parsingKey = false;
       continue;
-    }
+    } // {.class} {..css-module}
+
 
     if (char_ === classChar && key === '') {
       if (str.charAt(i + 1) === classChar) {
@@ -38,13 +48,15 @@ function getAttrs(str, start, options) {
 
       parsingKey = false;
       continue;
-    }
+    } // {#id}
+
 
     if (char_ === idChar && key === '') {
       key = 'id';
       parsingKey = false;
       continue;
-    }
+    } // {value="inside quotes"}
+
 
     if (char_ === '"' && value === '') {
       valueInsideQuotes = true;
@@ -54,10 +66,12 @@ function getAttrs(str, start, options) {
     if (char_ === '"' && valueInsideQuotes) {
       valueInsideQuotes = false;
       continue;
-    }
+    } // read next key/value pair
+
 
     if (char_ === pairSeparator && !valueInsideQuotes) {
       if (key === '') {
+        // beginning or ending space: { .red } vs {.red}
         continue;
       }
 
@@ -66,11 +80,13 @@ function getAttrs(str, start, options) {
       value = '';
       parsingKey = true;
       continue;
-    }
+    } // continue if character not allowed
+
 
     if (parsingKey && char_.search(allowedKeyChars) === -1) {
       continue;
-    }
+    } // no other conditions met; append to key/value
+
 
     if (parsingKey) {
       key += char_;
@@ -95,6 +111,13 @@ function getAttrs(str, start, options) {
 
   return attrs;
 }
+/**
+ * add attributes from [['key', 'val']] list
+ * @param {array} attrs: [['key', 'val']]
+ * @param {token} token: which token to add attributes
+ * @returns token
+ */
+
 
 function addAttrs(attrs, token) {
   for (let j = 0, l = attrs.length; j < l; ++j) {
@@ -111,13 +134,31 @@ function addAttrs(attrs, token) {
 
   return token;
 }
+/**
+ * Does string have properly formatted curly?
+ *
+ * start: '{.a} asdf'
+ * middle: 'a{.b}c'
+ * end: 'asdf {.a}'
+ * only: '{.a}'
+ *
+ * @param {string} where to expect {} curly. start, middle, end or only.
+ * @return {function(string)} Function which testes if string has curly.
+ */
+
 
 function hasDelimiters(where, options) {
   if (!where) {
     throw new Error('Parameter `where` not passed. Should be "start", "middle", "end" or "only".');
   }
+  /**
+   * @param {string} str
+   * @return {boolean}
+   */
+
 
   return function (str) {
+    // we need minimum three chars, for example {b}
     let minCurlyLength = options.leftDelimiter.length + 1 + options.rightDelimiter.length;
 
     if (!str || typeof str !== 'string' || str.length < minCurlyLength) {
@@ -135,9 +176,11 @@ function hasDelimiters(where, options) {
 
     switch (where) {
       case 'start':
+        // first char should be {, } found in char 2 or more
         slice = str.slice(0, options.leftDelimiter.length);
         start = slice === options.leftDelimiter ? 0 : -1;
-        end = start === -1 ? -1 : str.indexOf(options.rightDelimiter, rightDelimiterMinimumShift);
+        end = start === -1 ? -1 : str.indexOf(options.rightDelimiter, rightDelimiterMinimumShift); // check if next character is not one of the delimiters
+
         nextChar = str.charAt(end + options.rightDelimiter.length);
 
         if (nextChar && options.rightDelimiter.indexOf(nextChar) !== -1) {
@@ -147,12 +190,14 @@ function hasDelimiters(where, options) {
         break;
 
       case 'end':
+        // last char should be }
         start = str.lastIndexOf(options.leftDelimiter);
         end = start === -1 ? -1 : str.indexOf(options.rightDelimiter, start + rightDelimiterMinimumShift);
         end = end === str.length - options.rightDelimiter.length ? end : -1;
         break;
 
       case 'only':
+        // '{.a}'
         slice = str.slice(0, options.leftDelimiter.length);
         start = slice === options.leftDelimiter ? 0 : -1;
         slice = str.slice(str.length - options.rightDelimiter.length);
@@ -163,6 +208,10 @@ function hasDelimiters(where, options) {
     return start !== -1 && end !== -1 && validCurlyLength(str.substring(start, end + options.rightDelimiter.length));
   };
 }
+/**
+ * Removes last curly from string.
+ */
+
 
 function removeDelimiter(str, options) {
   const start = escapeRegExp(options.leftDelimiter);
@@ -171,15 +220,28 @@ function removeDelimiter(str, options) {
   let pos = str.search(curly);
   return pos !== -1 ? str.slice(0, pos) : str;
 }
+/**
+ * Escapes special characters in string s such that the string
+ * can be used in `new RegExp`. For example "[" becomes "\\[".
+ *
+ * @param {string} s Regex string.
+ * @return {string} Escaped string.
+ */
+
 
 function escapeRegExp(s) {
   return s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
+/**
+ * find corresponding opening block
+ */
+
 
 function getMatchingOpeningToken(tokens, i) {
   if (tokens[i].type === 'softbreak') {
     return false;
-  }
+  } // non closing blocks, example img
+
 
   if (tokens[i].nesting === 0) {
     return tokens[i];
@@ -196,6 +258,10 @@ function getMatchingOpeningToken(tokens, i) {
 
   return false;
 }
+/**
+ * from https://github.com/markdown-it/markdown-it/blob/master/lib/common/utils.js
+ */
+
 
 let HTML_ESCAPE_TEST_RE = /[&<>"]/;
 let HTML_ESCAPE_REPLACE_RE = /[&<>"]/g;

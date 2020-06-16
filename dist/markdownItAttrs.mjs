@@ -1,6 +1,13 @@
 /*! markdown-it-attrs 3.0.3-16 https://github.com//GerHobbelt/markdown-it-attrs @license MIT */
 
+/**
+ * parse {.class #id key=val} strings
+ * @param {string} str: string to parse
+ * @param {int} start: where to start parsing (including {)
+ * @returns {2d array}: [['key', 'val'], ['class', 'red']]
+ */
 function getAttrs(str, start, options) {
+  // not tab, line feed, form feed, space, solidus, greater than sign, quotation mark, apostrophe and equals sign
   const allowedKeyChars = /[^\t\n\f />"'=]/;
   const pairSeparator = ' ';
   const keySeparator = '=';
@@ -10,7 +17,9 @@ function getAttrs(str, start, options) {
   let key = '';
   let value = '';
   let parsingKey = true;
-  let valueInsideQuotes = false;
+  let valueInsideQuotes = false; // read inside {}
+  // start + left delimiter length to avoid beginning {
+  // breaks when } is found or end of string
 
   for (let i = start + options.leftDelimiter.length; i < str.length; i++) {
     if (str.slice(i, i + options.rightDelimiter.length) === options.rightDelimiter) {
@@ -21,12 +30,13 @@ function getAttrs(str, start, options) {
       break;
     }
 
-    let char_ = str.charAt(i);
+    let char_ = str.charAt(i); // switch to reading value if equal sign
 
     if (char_ === keySeparator && parsingKey) {
       parsingKey = false;
       continue;
-    }
+    } // {.class} {..css-module}
+
 
     if (char_ === classChar && key === '') {
       if (str.charAt(i + 1) === classChar) {
@@ -38,13 +48,15 @@ function getAttrs(str, start, options) {
 
       parsingKey = false;
       continue;
-    }
+    } // {#id}
+
 
     if (char_ === idChar && key === '') {
       key = 'id';
       parsingKey = false;
       continue;
-    }
+    } // {value="inside quotes"}
+
 
     if (char_ === '"' && value === '') {
       valueInsideQuotes = true;
@@ -54,10 +66,12 @@ function getAttrs(str, start, options) {
     if (char_ === '"' && valueInsideQuotes) {
       valueInsideQuotes = false;
       continue;
-    }
+    } // read next key/value pair
+
 
     if (char_ === pairSeparator && !valueInsideQuotes) {
       if (key === '') {
+        // beginning or ending space: { .red } vs {.red}
         continue;
       }
 
@@ -66,11 +80,13 @@ function getAttrs(str, start, options) {
       value = '';
       parsingKey = true;
       continue;
-    }
+    } // continue if character not allowed
+
 
     if (parsingKey && char_.search(allowedKeyChars) === -1) {
       continue;
-    }
+    } // no other conditions met; append to key/value
+
 
     if (parsingKey) {
       key += char_;
@@ -95,6 +111,13 @@ function getAttrs(str, start, options) {
 
   return attrs;
 }
+/**
+ * add attributes from [['key', 'val']] list
+ * @param {array} attrs: [['key', 'val']]
+ * @param {token} token: which token to add attributes
+ * @returns token
+ */
+
 
 function addAttrs(attrs, token) {
   for (let j = 0, l = attrs.length; j < l; ++j) {
@@ -111,13 +134,31 @@ function addAttrs(attrs, token) {
 
   return token;
 }
+/**
+ * Does string have properly formatted curly?
+ *
+ * start: '{.a} asdf'
+ * middle: 'a{.b}c'
+ * end: 'asdf {.a}'
+ * only: '{.a}'
+ *
+ * @param {string} where to expect {} curly. start, middle, end or only.
+ * @return {function(string)} Function which testes if string has curly.
+ */
+
 
 function hasDelimiters(where, options) {
   if (!where) {
     throw new Error('Parameter `where` not passed. Should be "start", "middle", "end" or "only".');
   }
+  /**
+   * @param {string} str
+   * @return {boolean}
+   */
+
 
   return function (str) {
+    // we need minimum three chars, for example {b}
     let minCurlyLength = options.leftDelimiter.length + 1 + options.rightDelimiter.length;
 
     if (!str || typeof str !== 'string' || str.length < minCurlyLength) {
@@ -135,9 +176,11 @@ function hasDelimiters(where, options) {
 
     switch (where) {
       case 'start':
+        // first char should be {, } found in char 2 or more
         slice = str.slice(0, options.leftDelimiter.length);
         start = slice === options.leftDelimiter ? 0 : -1;
-        end = start === -1 ? -1 : str.indexOf(options.rightDelimiter, rightDelimiterMinimumShift);
+        end = start === -1 ? -1 : str.indexOf(options.rightDelimiter, rightDelimiterMinimumShift); // check if next character is not one of the delimiters
+
         nextChar = str.charAt(end + options.rightDelimiter.length);
 
         if (nextChar && options.rightDelimiter.indexOf(nextChar) !== -1) {
@@ -147,12 +190,14 @@ function hasDelimiters(where, options) {
         break;
 
       case 'end':
+        // last char should be }
         start = str.lastIndexOf(options.leftDelimiter);
         end = start === -1 ? -1 : str.indexOf(options.rightDelimiter, start + rightDelimiterMinimumShift);
         end = end === str.length - options.rightDelimiter.length ? end : -1;
         break;
 
       case 'only':
+        // '{.a}'
         slice = str.slice(0, options.leftDelimiter.length);
         start = slice === options.leftDelimiter ? 0 : -1;
         slice = str.slice(str.length - options.rightDelimiter.length);
@@ -163,6 +208,10 @@ function hasDelimiters(where, options) {
     return start !== -1 && end !== -1 && validCurlyLength(str.substring(start, end + options.rightDelimiter.length));
   };
 }
+/**
+ * Removes last curly from string.
+ */
+
 
 function removeDelimiter(str, options) {
   const start = escapeRegExp(options.leftDelimiter);
@@ -171,15 +220,28 @@ function removeDelimiter(str, options) {
   let pos = str.search(curly);
   return pos !== -1 ? str.slice(0, pos) : str;
 }
+/**
+ * Escapes special characters in string s such that the string
+ * can be used in `new RegExp`. For example "[" becomes "\\[".
+ *
+ * @param {string} s Regex string.
+ * @return {string} Escaped string.
+ */
+
 
 function escapeRegExp(s) {
   return s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
+/**
+ * find corresponding opening block
+ */
+
 
 function getMatchingOpeningToken(tokens, i) {
   if (tokens[i].type === 'softbreak') {
     return false;
-  }
+  } // non closing blocks, example img
+
 
   if (tokens[i].nesting === 0) {
     return tokens[i];
@@ -197,10 +259,21 @@ function getMatchingOpeningToken(tokens, i) {
   return false;
 }
 
+/**
+ * If a pattern matches the token stream,
+ * then run transform.
+ */
+
 function patternsConfig(options) {
   const __hr = new RegExp('^ {0,3}[-*_]{3,} ?' + escapeRegExp(options.leftDelimiter) + '[^' + escapeRegExp(options.rightDelimiter) + ']');
 
   return [{
+    /**
+     * ```python {.cls}
+     * for i in range(10):
+     *     print(i)
+     * ```
+     */
     name: 'fenced code blocks',
     tests: [{
       shift: 0,
@@ -215,6 +288,12 @@ function patternsConfig(options) {
       token.info = removeDelimiter(token.info, options);
     }
   }, {
+    /**
+     * bla `click()`{.c} ![](img.png){.d}
+     *
+     * differs from 'inline attributes' as it does
+     * not have a closing tag (nesting: -1)
+     */
     name: 'inline nesting 0',
     tests: [{
       shift: 0,
@@ -242,8 +321,16 @@ function patternsConfig(options) {
       }
     }
   }, {
+    /**
+     * | h1 |
+     * | -- |
+     * | c1 |
+     * {.c}
+     */
     name: 'tables',
     tests: [{
+      // let this token be i, such that for-loop continues at
+      // next token after tokens.splice
       shift: 0,
       type: 'table_close'
     }, {
@@ -257,18 +344,24 @@ function patternsConfig(options) {
     transform: (tokens, i) => {
       let token = tokens[i + 2];
       let tableOpen = getMatchingOpeningToken(tokens, i);
-      let attrs = getAttrs(token.content, 0, options);
-      addAttrs(attrs, tableOpen);
+      let attrs = getAttrs(token.content, 0, options); // add attributes
+
+      addAttrs(attrs, tableOpen); // remove <p>{.c}</p>
+
       tokens.splice(i + 1, 3);
     }
   }, {
+    /**
+     * *emphasis*{.with attrs=1}
+     */
     name: 'inline attributes',
     tests: [{
       shift: 0,
       type: 'inline',
       children: [{
         shift: -1,
-        nesting: -1
+        nesting: -1 // closing inline tag, </em>{.a}
+
       }, {
         shift: 0,
         type: 'text',
@@ -284,6 +377,10 @@ function patternsConfig(options) {
       token.content = content.slice(content.indexOf(options.rightDelimiter) + options.rightDelimiter.length);
     }
   }, {
+    /**
+     * - item
+     * {.a}
+     */
     name: 'list softbreak',
     tests: [{
       shift: -2,
@@ -314,8 +411,17 @@ function patternsConfig(options) {
       tokens[i].children = tokens[i].children.slice(0, -2);
     }
   }, {
+    /**
+     * - nested list
+     *   - with double \n
+     *   {.a} <-- apply to nested ul
+     *
+     * {.b} <-- apply to root <ul>
+     */
     name: 'list double softbreak',
     tests: [{
+      // let this token be i = 0 so that we can erase
+      // the <p>{.a}</p> tokens below
       shift: 0,
       type: str => str === 'bullet_list_close' || str === 'ordered_list_close'
     }, {
@@ -339,6 +445,9 @@ function patternsConfig(options) {
       tokens.splice(i + 1, 3);
     }
   }, {
+    /**
+     * - end of {.list-item}
+     */
     name: 'list item end',
     tests: [{
       shift: -2,
@@ -361,6 +470,10 @@ function patternsConfig(options) {
       token.content = last(trimmed) !== ' ' ? trimmed : trimmed.slice(0, -1);
     }
   }, {
+    /**
+     * something with softbreak
+     * {.cls}
+     */
     name: '\n{.a} softbreak then curly in start',
     tests: [{
       shift: 0,
@@ -376,7 +489,8 @@ function patternsConfig(options) {
     }],
     transform: (tokens, i, j) => {
       let token = tokens[i].children[j];
-      let attrs = getAttrs(token.content, 0, options);
+      let attrs = getAttrs(token.content, 0, options); // find last closing tag
+
       let ii = i + 1;
 
       while (tokens[ii + 1] && tokens[ii + 1].nesting === -1) {
@@ -388,6 +502,9 @@ function patternsConfig(options) {
       tokens[i].children = tokens[i].children.slice(0, -2);
     }
   }, {
+    /**
+     * horizontal rule --- {#id}
+     */
     name: 'horizontal rule',
     tests: [{
       shift: 0,
@@ -413,6 +530,9 @@ function patternsConfig(options) {
       tokens.splice(i + 1, 2);
     }
   }, {
+    /**
+     * end of {.block}
+     */
     name: 'end of block',
     tests: [{
       shift: 0,
@@ -439,7 +559,8 @@ function patternsConfig(options) {
       token.content = last(trimmed) !== ' ' ? trimmed : trimmed.slice(0, -1);
     }
   }];
-}
+} // get last element of array or string
+
 
 function last(arr) {
   return arr.slice(-1)[0];
@@ -449,7 +570,8 @@ const defaultOptions = {
   leftDelimiter: '{',
   rightDelimiter: '}',
   allowedAttributes: [],
-  ignore: null
+  ignore: null // callback(token)
+
 };
 
 function attributes(md, options_) {
@@ -463,7 +585,8 @@ function attributes(md, options_) {
     for (let i = 0; i < tokens.length; i++) {
       for (let p = 0; p < patterns.length; p++) {
         let pattern = patterns[p];
-        let j = null;
+        let j = null; // position of child with offset 0
+
         let match = pattern.tests.every(t => {
           let res = test(tokens, i, t, options);
 
@@ -478,6 +601,7 @@ function attributes(md, options_) {
           pattern.transform(tokens, i, j);
 
           if (pattern.name === 'inline attributes' || pattern.name === 'inline nesting 0') {
+            // retry, may be several inline attributes
             p--;
           }
         }
@@ -487,14 +611,25 @@ function attributes(md, options_) {
 
   md.core.ruler.after('inline', 'curly_attributes', curlyAttrs);
 }
+/**
+ * Test if t matches token stream.
+ *
+ * @param {array} tokens
+ * @param {number} i
+ * @param {object} t Test to match.
+ * @return {object} { match: true|false, j: null|number }
+ */
+
 
 function test(tokens, i, t, options) {
   let res = {
     match: false,
-    j: null
+    j: null // position of child
+
   };
   let ii = t.shift !== undefined ? i + t.shift : t.position;
-  let token = get(tokens, ii);
+  let token = get(tokens, ii); // supports negative ii
+  // supports ignore token
 
   if (token === undefined || options.ignore && options.ignore(token)) {
     return res;
@@ -519,9 +654,11 @@ function test(tokens, i, t, options) {
       let children = token.children;
 
       if (childTests.every(tt => tt.position !== undefined)) {
+        // positions instead of shifts, do not loop all children
         match = childTests.every(tt => test(children, tt.position, tt, options).match);
 
         if (match) {
+          // we may need position of child in transform
           let j = last$1(childTests).position;
           res.j = j >= 0 ? j : children.length + j;
         }
@@ -530,7 +667,8 @@ function test(tokens, i, t, options) {
           match = childTests.every(tt => test(children, j, tt, options).match);
 
           if (match) {
-            res.j = j;
+            res.j = j; // all tests true, continue with next key of pattern t
+
             break;
           }
         }
@@ -571,10 +709,13 @@ function test(tokens, i, t, options) {
           break;
         }
 
+      // fall through for objects !== arrays of functions
+
       default:
         throw new Error(`Unknown type of pattern test (key: ${key}). Test should be of type boolean, number, string, function or array of functions.`);
     }
-  }
+  } // no tests returned false -> all tests returns true
+
 
   res.match = true;
   return res;
@@ -587,14 +728,22 @@ function isArrayOfObjects(arr) {
 function isArrayOfFunctions(arr) {
   return Array.isArray(arr) && arr.length && arr.every(i => typeof i === 'function');
 }
+/**
+ * Get n item of array. Supports negative n, where -1 is last
+ * element in array.
+ * @param {array} arr
+ * @param {number} n
+ */
+
 
 function get(arr, n) {
   return n >= 0 ? arr[n] : arr[arr.length + n];
-}
+} // get last element of array, safe - returns {} if not found
+
 
 function last$1(arr) {
   return arr.slice(-1)[0] || {};
-}
+} //module.exports = attributes;
 
 export default attributes;
 //# sourceMappingURL=markdownItAttrs.mjs.map
