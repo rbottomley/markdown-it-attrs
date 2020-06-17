@@ -1,10 +1,11 @@
+
 /* eslint-env mocha, es6 */
 
-const assert = require('assert');
-const Md = require('@gerhobbelt/markdown-it');
-const implicitFigures = require('@gerhobbelt/markdown-it-implicit-figures');
-const attrs = require('../');
-const utils = require('../dist/utils/utils.js');
+import * as assert from 'assert';
+import Md from '@gerhobbelt/markdown-it';
+import implicitFigures from '@gerhobbelt/markdown-it-implicit-figures';
+import attrs from '../';
+import * as utils from '../utils.js';
 
 
 function replaceDelimiters(text, options) {

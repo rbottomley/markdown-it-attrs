@@ -28,17 +28,21 @@ bundle:
 	mkdir dist
 	microbundle --no-compress --target node --strict --name ${GLOBAL_NAME}
 	mkdir dist/utils
-	microbundle --no-compress --target node --strict --name utils          --no-sourcemap -f cjs -o dist/utils ./utils.js
+	microbundle --no-compress --target node --strict --name utils          --no-sourcemap --no-pkg-main -f cjs -o dist/utils ./utils.js
 	mv dist/utils/markdown-it-attrs.js dist/utils/utils.js
+	microbundle --no-compress --target node --strict --name test           --no-sourcemap --no-pkg-main -f cjs -o test test/test.js
+	mv test/markdown-it-attrs.js test/test5.js
 	npx prepend-header 'dist/*js' support/header.js
 
 test:
-	mocha
+	# mocha
+	# kludgy way to execute the tests: `make build` compiles the tests to CommonJS in test5.js, then we execute those instead:
+	mocha test/test5.js
 
 coverage:
 	-rm -rf coverage
 	-rm -rf .nyc_output
-	cross-env NODE_ENV=test nyc mocha
+	cross-env NODE_ENV=test nyc mocha test/test5.js
 
 report-coverage: lint coverage
 
