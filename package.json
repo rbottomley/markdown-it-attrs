@@ -15,13 +15,13 @@
     "pandoc",
     "header_attributes"
   ],
-  "repository": "GerHobbelt/markdown-it-attrs",
-  "license": "MIT",
   "author": {
     "name": "Arve Seljebu",
     "email": "arve.seljebu@gmail.com",
     "url": "https://arve0.github.io"
   },
+  "repository": "GerHobbelt/markdown-it-attrs",
+  "license": "MIT",
   "type": "module",
   "source": "index.js",
   "main": "dist/markdownItAttrs.js",
@@ -46,6 +46,7 @@
     "@gerhobbelt/markdown-it-implicit-figures": "0.9.0-3",
     "@gerhobbelt/markdown-it-testgen": "0.1.6-7",
     "@gerhobbelt/prepend-header": "1.0.8-3",
+    "camelcase": "6.0.0",
     "chai": "4.2.0",
     "cross-env": "7.0.2",
     "eslint": "7.2.0",
