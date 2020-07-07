@@ -1,12 +1,5 @@
 # markdown-it-attrs
 
-[![Build Status](https://travis-ci.org/GerHobbelt/markdown-it-attrs.svg?branch=master)](https://travis-ci.org/GerHobbelt/markdown-it-attrs) 
-[![NPM version](https://badge.fury.io/js/@gerhobbeltmarkdown-it-attrs.svg)](http://badge.fury.io/js/@gerhobbeltmarkdown-it-attrs)
-[![Build Status](https://img.shields.io/travis/GerHobbelt/markdown-it-attrs/master.svg?style=flat)](https://travis-ci.org/GerHobbelt/markdown-it-attrs)
-[![NPM version](https://img.shields.io/npm/v/@gerhobbelt/markdown-it-attrs.svg?style=flat)](https://www.npmjs.org/package/@gerhobbelt/markdown-it-attrs)
-[![Coverage Status](https://img.shields.io/coveralls/GerHobbelt/markdown-it-attrs/master.svg?style=flat)](https://coveralls.io/r/GerHobbelt/markdown-it-attrs?branch=master)
-[![Coverage Status](https://coveralls.io/repos/github/GerHobbelt/markdown-it-attrs/badge.svg?branch=master)](https://coveralls.io/github/GerHobbelt/markdown-it-attrs?branch=master)
-
 Add classes, identifiers and attributes to your markdown with `{.class #identifier attr=value attr2="spaced value"}` curly brackets, similar to [pandoc's header attributes](http://pandoc.org/README.html#extension-header_attributes).
 
 Example input:
