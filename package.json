@@ -1,6 +1,6 @@
 {
   "name": "@rbottomley/markdown-it-attrs",
-  "version": "3.0.3-20",
+  "version": "3.0.3-22",
   "description": "Add classes, identifiers and attributes to your markdown with {} curly brackets, similar to pandoc's header attributes",
   "keywords": [
     "commonmark",
@@ -21,7 +21,7 @@
     "url": "https://arve0.github.io"
   },
   "repository": {
-    "url": "git@github.com/rbottomley/markdown-it-attrs.git"
+    "url": "git@github.com:rbottomley/markdown-it-attrs.git"
   },
   "license": "MIT",
   "source": "index.js",
