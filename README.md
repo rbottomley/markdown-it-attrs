@@ -63,15 +63,15 @@ Output:
 ## Install
 
 ```
-$ npm install --save @gerhobbelt/markdown-it-attrs
+$ npm install --save @rbottomley/markdown-it-attrs
 ```
 
 
 ## Usage
 
 ```js
-var md = require('@gerhobbelt/markdown-it')();
-var markdownItAttrs = require('@gerhobbelt/markdown-it-attrs');
+var md = require('@rbottomley/markdown-it')();
+var markdownItAttrs = require('@rbottomley/markdown-it-attrs');
 
 md.use(markdownItAttrs, {
   // optional, these are default options
@@ -182,8 +182,8 @@ If you need finer control, [decorate](https://github.com/rstacruz/markdown-it-de
 If you would like some other output, you can override renderers:
 
 ```js
-const md = require('@gerhobbelt/markdown-it')();
-const markdownItAttrs = require('@gerhobbelt/markdown-it-attrs');
+const md = require('@rbottomley/markdown-it')();
+const markdownItAttrs = require('@rbottomley/markdown-it-attrs');
 
 md.use(markdownItAttrs);
 
