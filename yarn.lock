@@ -914,12 +914,12 @@
   dependencies:
     js-yaml "3.14.0"
 
-"@gerhobbelt/markdown-it@^11.0.1-42":
-  version "11.0.1-43"
-  resolved "https://registry.yarnpkg.com/@gerhobbelt/markdown-it/-/markdown-it-11.0.1-43.tgz#ed7e11c73b6053c848a644c7cf2ccff1b98d389f"
-  integrity sha512-xLm5OOnKn27llW2E71GlWfJ3uaO36CBEsWFrmlUcdC9/WMbqMi/RlPAxSj9m/Enp2PPI99koNOseoBw53fQLRg==
+"@gerhobbelt/markdown-it@^11.0.1-45":
+  version "11.0.1-45"
+  resolved "https://registry.yarnpkg.com/@gerhobbelt/markdown-it/-/markdown-it-11.0.1-45.tgz#0bc84a326f87868987344194c5839c9b0982e83a"
+  integrity sha512-lBj/vtyTxzewGdTsdh7t2an5cPkYimIRQ/EkD6BMOwyXWgHQ4LSfSsF78A/06CIcwV3HV6G7mBwTx9cS1Bz1hA==
   dependencies:
-    argparse "1.0.10"
+    argparse "2.0.1"
     entities "2.0.3"
     github-markdown-css "4.0.0"
     linkify-it "3.0.2"
@@ -1154,7 +1154,12 @@ archy@^1.0.0:
   resolved "https://registry.yarnpkg.com/archy/-/archy-1.0.0.tgz#f9c8c13757cc1dd7bc379ac77b2c62a5c2868c40"
   integrity sha1-+cjBN1fMHde8N5rHeyxipcKGjEA=
 
-argparse@1.0.10, argparse@^1.0.7:
+argparse@2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/argparse/-/argparse-2.0.1.tgz#246f50f3ca78a3240f6c997e8a9bd1eac49e4b38"
+  integrity sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==
+
+argparse@^1.0.7:
   version "1.0.10"
   resolved "https://registry.yarnpkg.com/argparse/-/argparse-1.0.10.tgz#bcd6791ea5ae09725e17e5ad988134cd40b3d911"
   integrity sha512-o5Roy6tNG4SL/FOkCAN6RzjiakZS25RLYFrcMttJqbdd8BWrnA+fGz57iN5Pb06pvBGvl5gQ0B48dJlslXvoTg==
