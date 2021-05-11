@@ -47,7 +47,7 @@
     "@gerhobbelt/markdown-it-implicit-figures": "^0.10.0-6",
     "@gerhobbelt/markdown-it-testgen": "^0.1.6-15",
     "@gerhobbelt/prepend-header": "^1.0.10-4",
-    "camelcase": "6.0.0",
+    "camelcase": "6.2.0",
     "chai": "4.2.0",
     "cross-env": "7.0.2",
     "eslint": "^7.5.0",
