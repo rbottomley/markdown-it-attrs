@@ -50,7 +50,7 @@
     "camelcase": "6.2.0",
     "chai": "4.2.0",
     "cross-env": "7.0.2",
-    "eslint": "^7.26.0",
+    "eslint": "^7.27.0",
     "microbundle": "^0.13.0",
     "mocha": "^8.1.1",
     "nyc": "15.1.0"
