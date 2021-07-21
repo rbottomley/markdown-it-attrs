@@ -49,7 +49,7 @@
     "@gerhobbelt/prepend-header": "^1.0.10-4",
     "camelcase": "6.2.0",
     "chai": "4.3.4",
-    "cross-env": "7.0.2",
+    "cross-env": "7.0.3",
     "eslint": "^7.26.0",
     "microbundle": "^0.13.3",
     "mocha": "^8.1.1",
